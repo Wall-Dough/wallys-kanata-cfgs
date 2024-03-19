@@ -28,14 +28,14 @@
 )
 
 (defalias
-  lnm (tap-hold 200 200 (chord artsey S) (layer-switch num))
-  rnm (tap-hold 200 200 (chord artsey s) (layer-switch num))
-  lsur (tap-hold 200 200 (chord artsey A) (layer-switch surround))
-  rsur (tap-hold 200 200 (chord artsey a) (layer-switch surround))
-  lspc (tap-hold 200 200 (chord artsey E) (layer-switch special))
-  rspc (tap-hold 200 200 (chord artsey e) (layer-switch special))
-  laud (tap-hold 200 200 (chord artsey O) (layer-switch audio))
-  raud (tap-hold 200 200 (chord artsey o) (layer-switch audio))
+  lnm (tap-hold-except-keys 200 200 (chord artsey S) (layer-switch num) (r e w f d s a))
+  rnm (tap-hold-except-keys 200 200 (chord artsey s) (layer-switch num) (u i o j k l ;))
+  lsur (tap-hold-except-keys 200 200 (chord artsey A) (layer-switch surround) (e w q f d s a))
+  rsur (tap-hold-except-keys 200 200 (chord artsey a) (layer-switch surround) (i o p j k l ;))
+  lspc (tap-hold-except-keys 200 200 (chord artsey E) (layer-switch special) (r e w q d s a))
+  rspc (tap-hold-except-keys 200 200 (chord artsey e) (layer-switch special) (u i o p k l ;))
+  laud (tap-hold-except-keys 200 200 (chord artsey O) (layer-switch audio) (r e w q f d s))
+  raud (tap-hold-except-keys 200 200 (chord artsey o) (layer-switch audio) (u i o p j k l))
   basel (tap-hold 200 200 XX (layer-switch artsey))
   mwu (mwheel-up 50 120)
   mwd (mwheel-down 50 120)
@@ -51,14 +51,6 @@
   g    c    r    l
   h    t    n    s
   lmet spc
-)
-
-(deflayer dvorak
-  '    ,    .    p
-  a    o    e    u
-  g    c    r    l
-  h    t    n    s
-  (chord dvorak met) (multi spc (chord dvorak spc))
 )
 
 (deflayer artsey
@@ -117,10 +109,12 @@
   _ _
 )
 
-(defchords dvorak 5000
-  (met) lmet
-  (spc) spc
-  (met spc) (layer-switch artsey)
+(deflayer dvorak
+  '    ,    .    p
+  a    o    e    u
+  g    c    r    l
+  h    t    n    s
+  (chord dvorak met) (multi spc (chord dvorak spc))
 )
 
 (defchords artsey 5000
@@ -278,4 +272,10 @@
   (rmlft             ) mlft
   (      rmrgt       ) mrgt
   (            rmsdwn) @msdwn
+)
+
+(defchords dvorak 5000
+  (met) lmet
+  (spc) spc
+  (met spc) (layer-switch artsey)
 )
