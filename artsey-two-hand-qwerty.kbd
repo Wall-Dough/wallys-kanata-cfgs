@@ -1,0 +1,204 @@
+;; ARTSEY MINI 0.2 https://github.com/artseyio/artsey/issues/7
+;; https://monkeytype.com
+;; level 1
+;; language: english 1k
+;; include: a r t s e y i o
+;; exclude: q w u p d f g h j k l z x c v b n m
+;; level 2
+;; language: english 1k
+;; include: a r t s e y i o b m c n
+;; exclude: q w u p d f g h j k l z x v
+;; level 3
+;; language: english 1k
+;; include: a r t s e y i o b m c n p d f
+;; exclude: q w u g h j k l z x v
+;; level 4 
+;; language: english 1k
+;; include: a r t s e y i o b m c n p d f q u g
+;; exclude: w h j k l z x v
+
+;; Exactly one defcfg entry is required. This is used for configuration key-pairs.
+(defcfg
+  ;; Your keyboard device will likely differ from this.
+  linux-dev /dev/input/event1
+
+  ;; Windows doesn't need any input/output configuration entries; however, there
+  ;; must still be a defcfg entry. You can keep the linux-dev entry or delete
+  ;; it and leave it empty.
+)
+
+(defalias
+  snum  (tap-hold-except-keys 200 200 (chord artsey s) (layer-switch num)      (r e w   f d s a u i o   j k l ;))
+  ssur  (tap-hold-except-keys 200 200 (chord artsey a) (layer-switch surround) (  e w q f d s a   i o p j k l ;))
+  sspc  (tap-hold-except-keys 200 200 (chord artsey e) (layer-switch special)  (r e w q   d s a u i o p   k l ;))
+  saud  (tap-hold-except-keys 200 200 (chord artsey o) (layer-switch audio)    (r e w q f d s   u i o p j k l  ))
+  basel (tap-hold             200 200 XX               (layer-switch artsey))
+  mwu   (mwheel-up    50 120)
+  mwd   (mwheel-down  50 120)
+  msup  (movemouse-up    1 1)
+  mslft (movemouse-left  1 1)
+  msdwn (movemouse-down  1 1)
+  msrgt (movemouse-right 1 1)
+)
+
+(defsrc
+  q    w    e    r
+  a    s    d    f
+  u    i    o    p
+  j    k    l    ;
+  lmet spc
+)
+
+(deflayer artsey
+  @snum (chord artsey t) (chord artsey r) @ssur
+  @saud (chord artsey i) (chord artsey y) @sspc
+  @ssur (chord artsey r) (chord artsey t) @snum
+  @sspc (chord artsey y) (chord artsey i) @saud
+  (chord artsey met)     (chord artsey spc)
+)
+
+(deflayer num
+  @basel        (chord num 3) (chord num 2) (chord num 1)
+  XX            (chord num 6) (chord num 5) (chord num 4)
+  (chord num 1) (chord num 2) (chord num 3) @basel
+  (chord num 4) (chord num 5) (chord num 6) XX
+  _ _
+)
+
+(deflayer surround
+  S-lbrc lbrc S-9  @basel
+  S-rbrc rbrc S-0  XX
+  @basel S-9  lbrc S-lbrc
+  XX     S-0  rbrc S-rbrc
+  _ _
+)
+
+(deflayer special
+  bksl   scln grv  S-3
+  eql    min  S-2  @basel
+  S-3    grv  scln bksl
+  @basel S-2  min  eql
+  _ _
+)
+
+(deflayer audio
+  XX     volu mute pp
+  @basel vold prev next
+  pp     mute volu XX
+  next   prev vold @basel
+  _ _
+)
+
+(deflayer nav
+  pgup            home            (chord nav up)   end
+  pgdn            (chord nav lft) down             (chord nav rght)
+  end             (chord nav up)  home             pgup
+  (chord nav lft) down            (chord nav rght) pgdn
+  _ _
+)
+
+(deflayer mouse
+  @mwu               (chord mouse mrgt)  @msup               (chord mouse mlft)
+  @mwd               @mslft              (chord mouse msdwn) @msrgt
+  (chord mouse mlft) @msup               (chord mouse mrgt)  @mwu
+  @mslft             (chord mouse msdwn) @msrgt              @mwd
+  _ _
+)
+
+(deflayer qwerty
+  q    w    e    r
+  a    s    d    f
+  u    i    o    p
+  j    k    l    ;
+  (chord qwerty met) (multi spc (chord qwerty spc))
+)
+
+(defchords artsey 5000
+  (met    ) lmet
+  (    spc) spc
+  (met spc) (layer-switch qwerty)
+  ;; alpha
+  (a              ) a
+  (  r            ) r
+  (    t          ) t
+  (      s        ) s
+  (        e      ) e
+  (          y    ) y
+  (            i  ) i
+  (              o) o
+  (        e     o) b
+  (          y i o) m
+  (        e y    ) c
+  (            i o) n
+  (a r t          ) d
+  (        e   i o) p
+  (a r            ) f
+  (a   t s        ) q
+  (  r t          ) g
+  (          y i  ) u
+  (        e   i  ) h
+  (  r   s        ) v
+  (    t s        ) j
+  (a     s        ) w
+  (          y   o) k
+  (  r t s        ) x
+  (        e y i  ) l
+  (a r t s        ) z
+  ;; punctuation:
+  (a         y    ) comm
+  (  r       y    ) apo ;; single-quote
+  (a           i  ) .
+  (    t       i  ) S-1 ;; exclamation mark
+  (a             o) /
+  (      s       o) S-/ ;; question mark
+  ;; actions:
+  (        e y i o) spc
+  (a       e      ) enter
+  (  r     e      ) bspc
+  (a r           o) esc
+  (  r         i  ) del
+  (a r t         o) tab
+  ;; control:
+  (      s e      ) (one-shot  2000 lctrl)
+  (      s   y i o) (caps-word 2000)
+  (      s   y    ) (one-shot  2000 lmeta)
+  (  r t s e      ) (one-shot  2000 lsft)
+  (      s     i  ) (one-shot  2000 lalt)
+  (a r t s e y i o) clr
+  ;; mouse/nav
+  (  r     e   i  ) (layer-switch nav)
+  (a   t     y    ) (layer-switch mouse)
+)
+
+(defchords num 5000
+  (1          ) 1
+  (  2        ) 2
+  (    3      ) 3
+  (      4    ) 4
+  (        5  ) 5
+  (          6) 6
+  (1 2        ) 7
+  (  2 3      ) 8
+  (      4 5  ) 9
+  (        5 6) 0
+)
+
+(defchords nav 5000
+  (lft up rght) (layer-switch artsey)
+  (lft        ) lft
+  (    up     ) up
+  (       rght) rght
+)
+
+(defchords mouse 5000
+  (mrgt mlft msdwn) (layer-switch artsey)
+  (mrgt           ) mrgt
+  (     mlft      ) mlft
+  (          msdwn) @msdwn
+)
+
+(defchords qwerty 5000
+  (met    ) lmet
+  (    spc) spc
+  (met spc) (layer-switch artsey)
+)
